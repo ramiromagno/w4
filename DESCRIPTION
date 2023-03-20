@@ -1,0 +1,28 @@
+Package: w4
+Type: Package
+Title: W4 Method for Nonlinear Root Finding
+Version: 0.1.0
+Authors@R: c(
+    person(given = "Ramiro", family = "Magno", email = "ramiro.magno@gmail.com",
+    role = c("aut", "cre"), comment = c(ORCID = "0000-0001-5226-3441")),
+    person(given = "Gonçalo", family = "Magno", email = "goncalo.magno@gmail.com",
+    role = c("ctb"), comment = c(ORCID = "0000-0002-7379-9920")),
+    person(given = "Hirotada", family = "Okawa", email = "h.okawa@aoni.waseda.jp",
+    role = c("aut"), comment = c(ORCID = "0000-0001-7372-5131")),
+    person("Pattern Institute",
+    role = c("cph", "fnd"))
+    )
+Description: Routines to find the roots of nonlinear functions using the W4
+    method <doi:10.1016/j.apnum.2022.08.019>. The W4 method may be regarded as
+    an extension to the Newton-Raphson (NR) method where the iterative method
+    solves a second-order time-evolution system. Relative to the NR method, the
+    W4 method provides a wider convergence region (Newton basin) at the cost of
+    converging only linearly (the NR method converges quadratically). Therefore
+    the W4 method may be preferable to the NR method if global convergence is
+    the priority.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.3
+Imports: 
+    Matrix
