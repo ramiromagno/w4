@@ -1,13 +1,12 @@
-#' @importFrom Matrix t
 #' @export
 w4 <-
   function(x0,
            func,
            Fa,
            jacfunc,
-           dt,
-           maxiter,
-           errmax,
+           dt = 0.5,
+           maxiter = 1000L,
+           errmax = 1e-4,
            decomposition = c("lu", "lh", "sv")
   ) {
 
@@ -22,23 +21,23 @@ w4 <-
   # Main iteration loop
   for (i in seq_len(maxiter)) {
 
-    J0 <- jacfunc(x)
-    F0 <- func(x)
+    jac_x <- jacfunc(x)
+    f_x <- func(x)
     Fa0 <- Fa(x)
 
     # Criterion to stop the iteration
     # Evaluation of source func
     err <- 0
     for (k in seq_len(dim))
-      err <- max(err, abs(F0[k] / Fa0[k]))
+      err <- max(err, abs(f_x[k] / Fa0[k]))
 
     if (err < errmax) break
 
     with(
-      xy(jac = J0, decomposition = decomposition),
+      xy(jac = jac_x, decomposition = decomposition),
       {
         srcx <- X %*% p
-        srcp <- -2 * p - Y %*% F0
+        srcp <- -2 * p - Y %*% f_x
 
         # Update x and p.
         x <<- x + srcx * dt

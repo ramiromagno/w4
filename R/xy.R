@@ -48,7 +48,7 @@ xy_lh <- function(jac) {
 }
 
 #' @importFrom Matrix t
-xy_sv <- function(jac) {
+xy_sv <- function(jac, tol = 1e-7) {
 
   svd <- svd(jac)
   U <- svd$u
@@ -56,7 +56,7 @@ xy_sv <- function(jac) {
   # Singular values
   s <- svd$d
   s_ <- rep(1 , length(s))
-  s_[s > 1e-6] <- 1 / s[s > 1e-6]
+  s_[s > tol] <- 1 / s[s > tol]
   S <- diag(s_)
 
   # Vt is V transposed.
