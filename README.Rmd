@@ -1,0 +1,94 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+library(tidyverse)
+```
+
+# w4
+
+<!-- badges: start -->
+[![CRAN status](https://www.r-pkg.org/badges/version/w4)](https://CRAN.R-project.org/package=w4)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+<!-- badges: end -->
+
+`{w4}` provides the [W4 method](https://doi.org/10.1016/j.apnum.2022.08.019) for
+nonlinear root finding.
+
+Relative to the NR method, the W4 method provides a wider convergence region
+(Newton basin) at the cost of converging only linearly (the NR method converges
+quadratically).
+
+## Installation
+
+You can install the development version of `{w4}` from
+[GitHub](https://github.com/) with:
+
+``` r
+# install.packages("remotes")
+remotes::install_github("ramiromagno/w4")
+```
+
+## Basic usage
+
+```{r example}
+library(w4)
+
+func <- function(x) {
+  c(x[1] ^ 2 + x[2] ^ 2 - 4, x[1] ^ 2 * x[2] - 1)
+}
+
+func_abs <- function(x) {
+  c(abs(x[1] ^ 2) + abs(x[2] ^ 2) + abs(-4),
+    abs(x[1] ^ 2 * x[2]) + abs(-1))
+}
+
+jac <- function(x) {
+  matrix(c(2 * x[1], 2 * x[2],
+           2 * x[1] * x[2], x[1] ^ 2),
+         nrow = 2L,
+         byrow = TRUE)
+}
+
+# By default w4 uses SV decomposition, equivalent to `decomposition = "sv"`
+w4(x0 = c(-5, 0.5), func = func, Fa = func_abs, jacfunc = jac)
+
+# LH decomposition
+w4(x0 = c(-5, 0.5), func = func, Fa = func_abs, jacfunc = jac, decomposition = "lh")
+
+# LU decomposition
+w4(x0 = c(-5, 0.5), func = func, Fa = func_abs, jacfunc = jac, decomposition = "lu")
+```
+## A different starting point
+
+```{r}
+w4(x0 = c(1, -2.0), func = func, Fa = func_abs, jacfunc = jac, decomposition = "sv")
+w4(x0 = c(1, -2.0), func = func, Fa = func_abs, jacfunc = jac, decomposition = "lh")
+w4(x0 = c(1, -2.0), func = func, Fa = func_abs, jacfunc = jac, decomposition = "lu")
+```
+
+## Solving trace
+
+```{r}
+# Solution with trace
+range <- seq(-5, 5, 0.25)
+x0 <- t(as.matrix(expand.grid(x1 = range, x2 = range)))
+(sol_trace <- w4(x0 = x0, func = func, Fa = func_abs, jacfunc = jac, trace = TRUE))
+
+# pivot_longer(cols = starts_with("x"), names_to = "var", values_to = "x") %>%
+sol_trace %>%
+  group_by(trace_id) %>%
+  mutate(l = (i - 1) / (max(i) -1)) %>%
+  ggplot(aes(x = x1, y = x2, colour = l, alpha = l, group = trace_id)) +
+  geom_path(linewidth = 0.1) +
+  lims(x = c(-5, 5), y = c(-5, 5))
+```
